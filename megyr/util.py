@@ -1,3 +1,4 @@
+import importlib.util
 import os
 import subprocess
 
@@ -12,3 +13,11 @@ def run_in_dir(command, directory):
 def render_mustache_file(f, values):
     renderer = pystache.Renderer()
     return renderer.render_path(f, values)
+
+def load_py_module_from_file(name, filepath):
+    spec = importlib.util.spec_from_file_location(name, filepath)
+    new_module = importlib.util.module_from_spec(spec)
+
+    spec.loader.exec_module(new_module)
+
+    return new_module

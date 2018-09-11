@@ -72,7 +72,7 @@ def megyr(config, params, work_dir):
 
         for gyre_comb in gyre_grid:
             print("\t" + str(gyre_comb))
-            gyre.run_gyre(config, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+            gyre.run_gyre(config, values, rows, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
 if __name__ == "__main__":
     main()

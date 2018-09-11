@@ -2,11 +2,10 @@ import os.path
 
 import util
 
-def run_gyre(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
+def run_gyre(config, values, rows, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     gyre_dir_name = create_gyre_dir(config, mesa_comb, gyre_comb, output_dir, mesa_dir_name)
 
-    gyre_comb["freq_min"] = 1
-    gyre_comb["freq_max"] = 100
+    extract_additional_values(config, gyre_comb, values, rows, work_dir)
 
     gyre_config = create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name)
 
@@ -25,6 +24,21 @@ def create_gyre_dir(config, mesa_comb, gyre_comb, output_dir, mesa_dir_name):
     util.create_dir(gyre_dir)
 
     return dir_name
+
+def extract_additional_values(config, gyre_comb, values, rows, work_dir):
+    row = rows[rows["profile"] == gyre_comb["profile"]]
+
+    if "gyre_values_module" in config:
+        module_location = os.path.join(work_dir, config["gyre_values_module"])
+
+        calculations_module = util.load_py_module_from_file("calculations", module_location)
+
+        calculation_functions = calculations_module.values
+
+        for key in calculation_functions:
+            fun = calculation_functions[key]
+
+            gyre_comb[key] = fun(row)
 
 def create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name):
     end = -1 * len(".mustache")
