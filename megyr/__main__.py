@@ -3,6 +3,8 @@ import json
 import os.path
 import sys
 
+import pandas as pd
+
 import parameters
 
 def main():
@@ -53,16 +55,16 @@ def megyr(config, params, work_dir):
     print(params)
     print(work_dir)
 
-    mesa_grid = parameters.create_grid({}, params["mesa"])
+    mesa_grid = parameters.create_grid({}, [], params["mesa"])
 
     for comb in mesa_grid:
         print(comb)
 
         run_mesa(config, comb)
 
-        mesa_data = get_mesa_data(config, comb)
+        values, rows = get_mesa_data(config, comb)
 
-        gyre_grid = parameters.create_grid(mesa_data, params["gyre"])
+        gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
         for gyre_comb in gyre_grid:
             print("\t" + str(gyre_comb))
@@ -72,7 +74,10 @@ def run_mesa(config, comb):
     pass
 
 def get_mesa_data(config, comb):
-    pass
+    return ({}, pd.DataFrame({
+        "star_age": [0, 1, 1000000009, 2000000000],
+        "pulse": [0, 1, 2, 3]
+    }))
 
 def run_gyre(config, comb):
     pass
