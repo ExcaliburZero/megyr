@@ -3,9 +3,9 @@ import json
 import os.path
 import sys
 
-import pandas as pd
-
+import mesa
 import parameters
+import util
 
 def main():
     args = process_args(sys.argv)
@@ -45,39 +45,33 @@ def validate_config(config):
     assert("output_dir" in config)
     assert("mesa_configs" in config)
     assert("gyre_configs" in config)
+    assert("star_exec_location" in config)
 
 def validate_params(params):
     assert("mesa" in params)
     assert("gyre" in params)
 
 def megyr(config, params, work_dir):
-    print(config)
-    print(params)
-    print(work_dir)
+    output_dir = os.path.join(work_dir, config["output_dir"])
+
+    print(output_dir)
+    util.create_dir(output_dir)
 
     mesa_grid = parameters.create_grid({}, [], params["mesa"])
 
     for comb in mesa_grid:
         print(comb)
 
-        run_mesa(config, comb)
+        # TODO: Fix mesa_dir to mesa_dir_name
+        mesa_dir, logs_dir = mesa.run_mesa(config, comb, output_dir)
 
-        values, rows = get_mesa_data(config, comb)
+        values, rows = mesa.get_mesa_data(config, comb, mesa_dir)
 
         gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
         for gyre_comb in gyre_grid:
             print("\t" + str(gyre_comb))
             run_gyre(config, gyre_comb)
-
-def run_mesa(config, comb):
-    pass
-
-def get_mesa_data(config, comb):
-    return ({}, pd.DataFrame({
-        "star_age": [0, 1, 1000000009, 2000000000],
-        "pulse": [0, 1, 2, 3]
-    }))
 
 def run_gyre(config, comb):
     pass
