@@ -1,5 +1,7 @@
 [[source]]
-name = "megyr"
+url = "https://pypi.org/simple"
+name = "pypi"
+verify_ssl = true
 
 [packages]
 
