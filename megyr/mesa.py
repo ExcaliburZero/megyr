@@ -2,6 +2,7 @@ import os.path
 
 import pandas as pd
 
+import profile
 import util
 
 def run_mesa(config, comb, work_dir, output_dir):
@@ -63,8 +64,14 @@ def exec_mesa(config, work_dir, output_dir, mesa_dir_name):
 
     util.run_in_dir(mesa_command, mesa_dir)
 
-def get_mesa_data(config, comb, mesa_dir):
-    return ({}, pd.DataFrame({
-        "star_age": [0, 1, 1000000009, 2000000000],
-        "pulse": [0, 1, 2, 3]
-    }))
+def get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
+    logs_dir = os.path.join(output_dir, mesa_dir_name, logs_dir_name)
+
+    profile_index_name = "profiles.index"
+    profile_index = os.path.join(logs_dir, profile_index_name)
+
+    num_profiles = profile.read_num_profiles(profile_index)
+
+    data = profile.read_all_profile_attributes(logs_dir, num_profiles)
+
+    return {}, data

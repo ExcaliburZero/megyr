@@ -66,16 +66,13 @@ def megyr(config, params, work_dir):
 
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, comb, work_dir, output_dir)
 
-        values, rows = mesa.get_mesa_data(config, comb, mesa_dir_name)
+        values, rows = mesa.get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name)
 
         gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
         for gyre_comb in gyre_grid:
             print("\t" + str(gyre_comb))
             gyre.run_gyre(config, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
-
-def run_gyre(config, comb):
-    pass
 
 if __name__ == "__main__":
     main()
