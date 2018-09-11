@@ -3,6 +3,8 @@ import json
 import os.path
 import sys
 
+import parameters
+
 def main():
     args = process_args(sys.argv)
 
@@ -50,6 +52,30 @@ def megyr(config, params, work_dir):
     print(config)
     print(params)
     print(work_dir)
+
+    mesa_grid = parameters.create_grid({}, params["mesa"])
+
+    for comb in mesa_grid:
+        print(comb)
+
+        run_mesa(config, comb)
+
+        mesa_data = get_mesa_data(config, comb)
+
+        gyre_grid = parameters.create_grid(mesa_data, params["gyre"])
+
+        for gyre_comb in gyre_grid:
+            print("\t" + str(gyre_comb))
+            run_gyre(config, gyre_comb)
+
+def run_mesa(config, comb):
+    pass
+
+def get_mesa_data(config, comb):
+    pass
+
+def run_gyre(config, comb):
+    pass
 
 if __name__ == "__main__":
     main()
