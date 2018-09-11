@@ -63,7 +63,7 @@ def megyr(config, params, work_dir):
         print(comb)
 
         # TODO: Fix mesa_dir to mesa_dir_name
-        mesa_dir, logs_dir = mesa.run_mesa(config, comb, output_dir)
+        mesa_dir, logs_dir = mesa.run_mesa(config, comb, work_dir, output_dir)
 
         values, rows = mesa.get_mesa_data(config, comb, mesa_dir)
 
