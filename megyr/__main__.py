@@ -56,13 +56,12 @@ def validate_params(params):
 def megyr(config, params, work_dir):
     output_dir = os.path.join(work_dir, config["output_dir"])
 
-    print(output_dir)
     util.create_dir(output_dir)
 
     mesa_grid = parameters.create_grid({}, [], params["mesa"])
 
     for comb in mesa_grid:
-        print(comb)
+        print("MESA: " + str(comb))
 
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, comb, work_dir, output_dir)
 
@@ -71,7 +70,7 @@ def megyr(config, params, work_dir):
         gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
         for gyre_comb in gyre_grid:
-            print("\t" + str(gyre_comb))
+            print("GYRE: " + str(gyre_comb))
             gyre.run_gyre(config, values, rows, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
 if __name__ == "__main__":

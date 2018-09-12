@@ -29,8 +29,6 @@ def load_py_module_from_file(name, filepath):
 def has_completed_file(directory):
     filepath = os.path.join(directory, COMPLETED_FILENAME)
 
-    print("Checking: " + filepath)
-
     return os.path.isfile(filepath)
 
 def create_completed_file(directory):

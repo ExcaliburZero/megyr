@@ -15,7 +15,7 @@ def run_gyre(config, values, rows, mesa_comb, gyre_comb, work_dir, output_dir, m
         exec_gyre(config["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
         util.create_completed_file(gyre_dir)
     else:
-        print("Already completed GYRE: " + str(mesa_comb) + str(gyre_comb))
+        print("Already completed GYRE")
 
     return gyre_dir_name
 
@@ -26,7 +26,6 @@ def create_gyre_dir(config, mesa_comb, gyre_comb, output_dir, mesa_dir_name):
 
     gyre_dir = os.path.join(output_dir, mesa_dir_name, dir_name)
 
-    print(gyre_dir)
     util.create_dir(gyre_dir)
 
     return dir_name
@@ -61,9 +60,6 @@ def create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_
 
     with open(config_file_out, "w") as out:
         out.write(applied_contents)
-
-    print(data)
-    print(config_file_out)
 
     return config_file[:end]
 
