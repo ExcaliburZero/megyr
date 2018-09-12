@@ -5,11 +5,17 @@ import util
 def run_gyre(config, values, rows, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     gyre_dir_name = create_gyre_dir(config, mesa_comb, gyre_comb, output_dir, mesa_dir_name)
 
-    extract_additional_values(config, gyre_comb, values, rows, work_dir)
+    gyre_dir = os.path.join(output_dir, mesa_dir_name, gyre_dir_name)
 
-    gyre_config = create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name)
+    if not util.has_completed_file(gyre_dir):
+        extract_additional_values(config, gyre_comb, values, rows, work_dir)
 
-    exec_gyre(config["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
+        gyre_config = create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name)
+
+        exec_gyre(config["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
+        util.create_completed_file(gyre_dir)
+    else:
+        print("Already completed GYRE: " + str(mesa_comb) + str(gyre_comb))
 
     return gyre_dir_name
 

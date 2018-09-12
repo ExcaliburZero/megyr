@@ -10,9 +10,15 @@ def run_mesa(config, comb, work_dir, output_dir):
 
     logs_dir_name = setup_mesa_dir(output_dir, mesa_dir_name)
 
-    create_mesa_configs(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+    mesa_dir = os.path.join(output_dir, mesa_dir_name)
+    if not util.has_completed_file(mesa_dir):
+        create_mesa_configs(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
-    exec_mesa(config, work_dir, output_dir, mesa_dir_name)
+        exec_mesa(config, work_dir, output_dir, mesa_dir_name)
+
+        util.create_completed_file(mesa_dir)
+    else:
+        print("Already completed MESA: " + str(comb))
 
     return mesa_dir_name, logs_dir_name
 
