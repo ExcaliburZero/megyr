@@ -48,6 +48,8 @@ def validate_config(config):
     assert("gyre_config" in config)
     assert("star_exec_location" in config)
     assert("gyre_location" in config)
+    assert("mesa_MP_threads" in config)
+    assert("gyre_MP_threads" in config)
 
 def validate_params(params):
     assert("mesa" in params)
@@ -63,11 +65,15 @@ def megyr(config, params, work_dir):
     for comb in mesa_grid:
         print("MESA: " + str(comb))
 
+        util.set_num_mp_threads(config["mesa_MP_threads"])
+
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, comb, work_dir, output_dir)
 
         values, rows = mesa.get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name)
 
         gyre_grid = parameters.create_grid(values, rows, params["gyre"])
+
+        util.set_num_mp_threads(config["gyre_MP_threads"])
 
         for gyre_comb in gyre_grid:
             print("GYRE: " + str(gyre_comb))

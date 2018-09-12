@@ -8,6 +8,8 @@ import pystache
 
 COMPLETED_FILENAME = "completed.txt"
 
+MP_THREADS_ENV_VAR = "OMP_NUM_THREADS"
+
 def create_dir(path):
     os.makedirs(path, exist_ok=True)
 
@@ -36,3 +38,8 @@ def create_completed_file(directory):
 
     with open(filepath, "w") as f:
         f.write(str(datetime.datetime.now()))
+
+def set_num_mp_threads(num):
+    assert(num > 0)
+
+    os.environ[MP_THREADS_ENV_VAR] = str(num)
