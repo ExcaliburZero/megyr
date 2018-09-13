@@ -7,6 +7,7 @@ import pandas as pd
 
 import gyre
 import mesa
+import oscillations_summary
 import parameters
 import util
 
@@ -49,6 +50,7 @@ def validate_config(config):
     assert("mesa_configs" in config)
     assert("gyre_config" in config)
     assert("mesa_profiles_summary_filename" in config)
+    assert("gyre_oscillations_summary_filename" in config)
     assert("star_exec_location" in config)
     assert("gyre_location" in config)
     assert("mesa_MP_threads" in config)
@@ -78,9 +80,22 @@ def megyr(config, params, work_dir):
 
         util.set_num_mp_threads(config["gyre_MP_threads"])
 
+        oscillations = pd.DataFrame()
         for gyre_comb in gyre_grid:
             print("GYRE: " + str(gyre_comb))
-            gyre.run_gyre(config, values, rows, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+            ad_output_summary_file = gyre.run_gyre(config, values, rows, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+
+            summary = oscillations_summary.read_oscillations_summary_file(ad_output_summary_file).data
+
+            for key in gyre_comb:
+                v = gyre_comb[key]
+
+                summary[key] = v
+
+            oscillations = pd.concat([oscillations, summary])
+
+        oscillations_file = os.path.join(output_dir, mesa_dir_name, config["gyre_oscillations_summary_filename"])
+        oscillations.to_csv(oscillations_file, index=False)
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     profiles_summary_file = os.path.join(output_dir, mesa_dir_name, config["mesa_profiles_summary_filename"])
