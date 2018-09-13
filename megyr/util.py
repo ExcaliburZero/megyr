@@ -28,13 +28,13 @@ def load_py_module_from_file(name, filepath):
 
     return new_module
 
-def has_completed_file(directory):
-    filepath = os.path.join(directory, COMPLETED_FILENAME)
+def has_completed_file(directory, filename=COMPLETED_FILENAME):
+    filepath = os.path.join(directory, filename)
 
     return os.path.isfile(filepath)
 
-def create_completed_file(directory):
-    filepath = os.path.join(directory, COMPLETED_FILENAME)
+def create_completed_file(directory, filename=COMPLETED_FILENAME):
+    filepath = os.path.join(directory, filename)
 
     with open(filepath, "w") as f:
         f.write(str(datetime.datetime.now()))

@@ -3,32 +3,38 @@ import os.path
 import util
 
 def run_gyre(config, values, rows, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
-    gyre_dir_name = create_gyre_dir(config, mesa_comb, gyre_comb, output_dir, mesa_dir_name)
+    mesa_dir = os.path.join(output_dir, mesa_dir_name)
+    gyre_dir_name = create_gyre_dir(mesa_dir)
 
-    gyre_dir = os.path.join(output_dir, mesa_dir_name, gyre_dir_name)
+    gyre_prefix = create_gyre_prefix(gyre_comb)
 
-    if not util.has_completed_file(gyre_dir):
+    gyre_completed = os.path.join(gyre_dir_name, "completed_" + gyre_prefix + ".txt")
+
+    if not util.has_completed_file(mesa_dir, filename=gyre_completed):
         extract_additional_values(config, gyre_comb, values, rows, work_dir)
 
-        gyre_config = create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name)
+        gyre_config = create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name)
 
-        exec_gyre(config["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
-        util.create_completed_file(gyre_dir)
+        exec_gyre(config["gyre_location"], output_dir, mesa_dir_name, gyre_config)
+        util.create_completed_file(mesa_dir, filename=gyre_completed)
     else:
         print("Already completed GYRE")
 
-    return gyre_dir_name
-
-def create_gyre_dir(config, mesa_comb, gyre_comb, output_dir, mesa_dir_name):
-    dir_name = "gyre_"
+def create_gyre_prefix(gyre_comb):
+    name = "gyre_"
     for key in gyre_comb:
-        dir_name += key + "_" + str(gyre_comb[key]) + "__"
+        name += key + "_" + str(gyre_comb[key]) + "__"
 
-    gyre_dir = os.path.join(output_dir, mesa_dir_name, dir_name)
+    return name
+
+def create_gyre_dir(mesa_dir):
+    gyre_dir_name = "gyre"
+
+    gyre_dir = os.path.join(mesa_dir, gyre_dir_name)
 
     util.create_dir(gyre_dir)
 
-    return dir_name
+    return gyre_dir_name
 
 def extract_additional_values(config, gyre_comb, values, rows, work_dir):
     row = rows[rows["profile"] == gyre_comb["profile"]]
@@ -45,26 +51,30 @@ def extract_additional_values(config, gyre_comb, values, rows, work_dir):
 
             gyre_comb[key] = fun(row)
 
-def create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name):
+def create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name):
     end = -1 * len(".mustache")
 
     config_file = config["gyre_config"]
     config_file_in = os.path.join(work_dir, config_file)
-    config_file_out = os.path.join(output_dir, mesa_dir_name, gyre_dir_name, config_file[:end])
+
+    config_file_out_name = config_file[:end] + "_" + gyre_prefix
+    config_file_out = os.path.join(output_dir, mesa_dir_name, config_file_out_name)
 
     data = mesa_comb.copy()
     data["logs_dir"] = logs_dir_name
+
     data.update(gyre_comb)
+    data["gyre_dir"] = gyre_dir_name
 
     applied_contents = util.render_mustache_file(config_file_in, data)
 
     with open(config_file_out, "w") as out:
         out.write(applied_contents)
 
-    return config_file[:end]
+    return config_file_out_name
 
-def exec_gyre(gyre_location, output_dir, mesa_dir_name, gyre_dir_name, gyre_config):
-    gyre_dir = os.path.join(output_dir, mesa_dir_name, gyre_dir_name)
+def exec_gyre(gyre_location, output_dir, mesa_dir_name, gyre_config):
+    gyre_dir = os.path.join(output_dir, mesa_dir_name)
 
     gyre_command = gyre_location + " " + gyre_config
 
