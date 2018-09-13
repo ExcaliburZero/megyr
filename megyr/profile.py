@@ -16,16 +16,16 @@ def read_all_profile_attributes(logs_dir, num_profiles, profile_prefix="profile"
         name = profile_prefix + str(i) + profile_suffix
         filepath = os.path.join(logs_dir, name)
 
-        attr = read_profile_file(filepath).attributes
+        attr = read_profile_file(filepath, read_data=False).attributes
         attr["profile"] = i
 
         attributes = pd.concat([attributes, attr])
 
     return attributes
 
-def read_profile_file(filepath, attributes_start_row=1, data_start_row=5):
+def read_profile_file(filepath, attributes_start_row=1, data_start_row=5, read_data=True):
     attributes = pd.read_fwf(filepath, skiprows=attributes_start_row, nrows=1)
-    data = pd.read_fwf(filepath, skiprows=data_start_row)
+    data = pd.read_fwf(filepath, skiprows=data_start_row) if read_data else None
 
     return MESAProfile(attributes, data)
 
