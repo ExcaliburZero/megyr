@@ -58,7 +58,6 @@ def validate_config(config):
 
 def validate_params(params):
     assert("mesa" in params)
-    assert("gyre" in params)
 
 def megyr(config, params, work_dir):
     output_dir = os.path.join(work_dir, config["output_dir"])
@@ -71,8 +70,6 @@ def megyr(config, params, work_dir):
         print("MESA: " + str(comb))
 
         util.set_num_mp_threads(config["mesa_MP_threads"])
-
-        # TODO: Add a step to calculate values for MESA config if specified in config
 
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, comb, work_dir, output_dir)
 
