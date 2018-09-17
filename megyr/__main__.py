@@ -72,30 +72,39 @@ def megyr(config, params, work_dir):
 
         util.set_num_mp_threads(config["mesa_MP_threads"])
 
+        # TODO: Add a step to calculate values for MESA config if specified in config
+
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, comb, work_dir, output_dir)
 
         values, rows = load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name)
+
+        # TODO: Add preivously calculated mesa values to "values"
 
         gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
         util.set_num_mp_threads(config["gyre_MP_threads"])
 
-        oscillations = pd.DataFrame()
-        for gyre_comb in gyre_grid:
-            print("GYRE: " + str(gyre_comb))
-            ad_output_summary_file = gyre.run_gyre(config, values, rows, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+        if "gyre" in params:
+            gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
-            summary = oscillations_summary.read_oscillations_summary_file(ad_output_summary_file).data
+            util.set_num_mp_threads(config["gyre_MP_threads"])
 
-            for key in gyre_comb:
-                v = gyre_comb[key]
+            oscillations = pd.DataFrame()
+            for gyre_comb in gyre_grid:
+                print("GYRE: " + str(gyre_comb))
+                ad_output_summary_file = gyre.run_gyre(config, values, rows, comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
-                summary[key] = v
+                summary = oscillations_summary.read_oscillations_summary_file(ad_output_summary_file).data
 
-            oscillations = pd.concat([oscillations, summary])
+                for key in gyre_comb:
+                    v = gyre_comb[key]
 
-        oscillations_file = os.path.join(output_dir, mesa_dir_name, config["gyre_oscillations_summary_filename"])
-        oscillations.to_csv(oscillations_file, index=False)
+                    summary[key] = v
+
+                oscillations = pd.concat([oscillations, summary])
+
+            oscillations_file = os.path.join(output_dir, mesa_dir_name, config["gyre_oscillations_summary_filename"])
+            oscillations.to_csv(oscillations_file, index=False)
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     profiles_summary_file = os.path.join(output_dir, mesa_dir_name, config["mesa_profiles_summary_filename"])
