@@ -77,11 +77,11 @@ def megyr(config, params, work_dir):
 
         # TODO: Add preivously calculated mesa values to "values"
 
-        gyre_grid = parameters.create_grid(values, rows, params["gyre"])
-
-        util.set_num_mp_threads(config["gyre_MP_threads"])
-
         if "gyre" in params:
+            gyre_grid = parameters.create_grid(values, rows, params["gyre"])
+
+            util.set_num_mp_threads(config["gyre_MP_threads"])
+
             gyre_grid = parameters.create_grid(values, rows, params["gyre"])
 
             util.set_num_mp_threads(config["gyre_MP_threads"])
