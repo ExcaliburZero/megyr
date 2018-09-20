@@ -16,7 +16,7 @@ def run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa
     if not util.has_completed_file(mesa_dir, filename=gyre_completed):
         derived = config["stages"]["gyre_derived"](mesa_comb, mesa_data, gyre_comb)
 
-        gyre_config = create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name)
+        gyre_config = create_gyre_config(config, mesa_comb, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name)
 
         exec_gyre(config["settings"]["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
         util.create_completed_file(mesa_dir, filename=gyre_completed)

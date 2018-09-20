@@ -3,6 +3,7 @@ import importlib.util
 import os
 import os.path
 import subprocess
+import sys
 
 import pystache
 
@@ -43,3 +44,6 @@ def set_num_mp_threads(num):
     assert(num > 0)
 
     os.environ[MP_THREADS_ENV_VAR] = str(num)
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)

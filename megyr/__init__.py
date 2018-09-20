@@ -5,6 +5,7 @@ import sys
 
 import pandas as pd
 
+from . import config_validation
 from . import gyre
 from . import mesa
 from . import oscillations_summary
@@ -12,7 +13,15 @@ from . import parameters
 from . import util
 
 def run(config):
-    validate_config(config)
+    config_errors = config_validation.validate_config(config)
+
+    if len(config_errors) > 0:
+        util.eprint("Found {} config errors.\n".format(len(config_errors)))
+
+        for i in range(1, len(config_errors) + 1):
+            util.eprint("{}) {}\n".format(i, config_errors[i - 1]))
+
+        sys.exit(1)
 
     work_dir = "."
     output_dir = os.path.join(work_dir, config["output"]["output_dir"])
@@ -33,7 +42,7 @@ def run(config):
 
         # TODO: Add preivously calculated mesa values to "values"
 
-        if should_run_gyre(config):
+        if config_validation.should_run_gyre(config):
             gyre_params = config["stages"]["gyre_params"](mesa_params, mesa_data)
 
             gyre_grid = parameters.create_grid({}, mesa_data, gyre_params)
@@ -56,12 +65,6 @@ def run(config):
 
             oscillations_file = os.path.join(output_dir, mesa_dir_name, config["output"]["gyre_oscillations_summary_file"])
             oscillations.to_csv(oscillations_file, index=False)
-
-def validate_config(config):
-    pass
-
-def should_run_gyre(config):
-    return "gyre_config" in config["input"]
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     filename = config["output"]["mesa_profile_summary_file"]
