@@ -83,4 +83,4 @@ def get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
 
     data = profile.read_all_profile_attributes(logs_dir, num_profiles)
 
-    return {}, data
+    return data
