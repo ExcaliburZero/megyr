@@ -144,7 +144,8 @@ def megyr(config, params, work_dir):
             oscillations.to_csv(oscillations_file, index=False)
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
-    profiles_summary_file = os.path.join(output_dir, mesa_dir_name, config["mesa_profiles_summary_filename"])
+    filename = config["output"]["mesa_profile_summary_file"]
+    profiles_summary_file = os.path.join(output_dir, mesa_dir_name, filename)
     if os.path.isfile(profiles_summary_file):
         values = {}
         rows = pd.read_csv(profiles_summary_file)

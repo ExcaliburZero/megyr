@@ -12,9 +12,9 @@ def run_mesa(config, comb, work_dir, output_dir):
 
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
     if not util.has_completed_file(mesa_dir):
-        extract_additional_values(config, comb)
+        derived = extract_additional_values(config, comb)
 
-        create_mesa_configs(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+        create_mesa_configs(config, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
         exec_mesa(config, work_dir, output_dir, mesa_dir_name)
 
@@ -26,7 +26,7 @@ def run_mesa(config, comb, work_dir, output_dir):
 
 def create_mesa_dir(config, comb, output_dir):
     dir_name = "mesa_"
-    for key in comb:
+    for key in sorted(comb.keys()):
         dir_name += key + "_" + str(comb[key]) + "__"
 
     mesa_dir = os.path.join(output_dir, dir_name)
