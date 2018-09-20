@@ -1,6 +1,6 @@
 import os.path
 
-import util
+from . import util
 
 def run_gyre(config, values, rows, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     mesa_dir = os.path.join(output_dir, mesa_dir_name)

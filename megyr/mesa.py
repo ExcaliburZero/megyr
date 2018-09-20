@@ -2,8 +2,8 @@ import os.path
 
 import pandas as pd
 
-import profile
-import util
+from . import profile
+from . import util
 
 def run_mesa(config, comb, work_dir, output_dir):
     mesa_dir_name = create_mesa_dir(config, comb, output_dir)
