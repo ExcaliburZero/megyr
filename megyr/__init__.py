@@ -29,16 +29,18 @@ def main():
 def run(config):
     validate_config(config)
 
+    work_dir = "."
     output_dir = os.path.join(work_dir, config["output"]["output_dir"])
 
     util.create_dir(output_dir)
 
-    mesa_grid = parameters.create_grid({}, [], params["mesa"])
+    mesa_params = config["stages"]["mesa_params"]
+    mesa_grid = parameters.create_grid({}, [], mesa_params)
 
     for comb in mesa_grid:
         print("MESA: " + str(comb))
 
-        util.set_num_mp_threads(config["mesa_MP_threads"])
+        util.set_num_mp_threads(config["settings"]["mesa_mp_threads"])
 
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, comb, work_dir, output_dir)
 
@@ -92,15 +94,7 @@ def validate_args(args):
     assert(os.path.isdir(args.work_dir))
 
 def validate_config(config):
-    assert("output_dir" in config)
-    assert("mesa_configs" in config)
-    assert("gyre_config" in config)
-    assert("mesa_profiles_summary_filename" in config)
-    assert("gyre_oscillations_summary_filename" in config)
-    assert("star_exec_location" in config)
-    assert("gyre_location" in config)
-    assert("mesa_MP_threads" in config)
-    assert("gyre_MP_threads" in config)
+    pass
 
 def validate_params(params):
     assert("mesa" in params)
