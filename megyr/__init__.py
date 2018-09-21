@@ -34,7 +34,8 @@ def run(config):
     for mesa_comb in mesa_grid:
         print("MESA: " + str(mesa_comb))
 
-        util.set_num_mp_threads(config["settings"]["mesa_mp_threads"])
+        if config_validation.nested_in(config, ["settings", "mesa_mp_threads"]):
+            util.set_num_mp_threads(config["settings"]["mesa_mp_threads"])
 
         mesa_dir_name, logs_dir_name = mesa.run_mesa(config, mesa_comb, work_dir, output_dir)
 
@@ -47,7 +48,8 @@ def run(config):
 
             gyre_grid = parameters.create_grid({}, mesa_data, gyre_params)
 
-            util.set_num_mp_threads(config["settings"]["gyre_mp_threads"])
+            if config_validation.nested_in(config, ["settings", "gyre_mp_threads"]):
+                util.set_num_mp_threads(config["settings"]["gyre_mp_threads"])
 
             oscillations = pd.DataFrame()
             for gyre_comb in gyre_grid:
