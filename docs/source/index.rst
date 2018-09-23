@@ -11,6 +11,7 @@ Welcome to Megyr's documentation!
    :caption: Contents:
 
    getting-started
+   configuration
 
 
 
