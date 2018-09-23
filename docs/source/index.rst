@@ -10,6 +10,8 @@ Welcome to Megyr's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   getting-started
+
 
 
 Indices and tables
