@@ -15,6 +15,8 @@ from . import util
 def run(config):
     config_errors = config_validation.validate_config(config)
 
+    config_validation.set_defaults(config)
+
     if len(config_errors) > 0:
         util.eprint("Found {} config errors.\n".format(len(config_errors)))
 

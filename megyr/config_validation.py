@@ -2,10 +2,7 @@ def validate_config(config):
     errors = []
 
     assert_to_list(errors, "input" in config, "[no_input] Could not find \"input\" section in config. \"input\" section must be present in order to run MESA or GYRE.")
-    assert_to_list(errors, "output" in config, "[no_output] Could not find \"output\" section in config. \"output\" section must be present in order save the results of MESA and GYRE.")
     assert_to_list(errors, "stages" in config, "[no_stages] Could not find \"stages\" section in config. \"stages\" section must be present in order to run MESA or GYRE.")
-
-    assert_to_list(errors, nested_in(config, ["output", "output_dir"]), "[no_output_dir] Could not find \"output_dir\" setting in the \"output\" section in config. \"output_dir\" setting must be present in order save the results of MESA and GYRE.")
 
     assert_to_list(errors, nested_in(config, ["input", "mesa_configs"]), "[no_mesa_configs] Could not find \"mesa_configs\" setting in \"input\" section in config. The \"mesa_configs\" setting must be present in order to run MESA.")
 
@@ -26,6 +23,17 @@ def validate_config(config):
 
     return errors
 
+def set_defaults(config):
+    if not nested_in(config, ["output", "output_dir"]):
+        nested_put(config, ["output", "output_dir"], "out")
+
+    if not nested_in(config, ["settings", "mesa_star_location"]):
+        nested_put(config, ["settings", "mesa_star_location"], "star")
+
+    if not nested_in(config, ["settings", "gyre_mp_threads"]) and \
+            nested_in(config, ["settings", "mesa_mp_threads"]):
+        nested_put(config, ["settings", "gyre_mp_threads"], config["settings"]["mesa_mp_threads"])
+
 def assert_to_list(errors, condition, message):
     if not condition:
         errors.append((message))
@@ -41,3 +49,15 @@ def nested_in(config, nested_keys):
             return False
 
     return True
+
+def nested_put(config, nested_keys, value):
+    if len(nested_keys) == 0:
+        raise Exception("Invalid number of nested keys.")
+    if len(nested_keys) == 1:
+        config[nested_keys[0]] = value
+    else:
+        next_key = nested_keys[0]
+        if next_key not in config:
+            config[next_key] = {}
+
+        nested_put(config[next_key], nested_keys[1:], value)

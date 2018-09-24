@@ -106,7 +106,7 @@ The number of Open MP threads to have MESA use.
 
   * Default
 
-    * ``$OMP_NUM_THREADS``
+    * Will use the number of threads set in ``$OMP_NUM_THREADS``.
 
   * Examples
 
@@ -120,7 +120,7 @@ The number of Open MP threads to have GYRE use.
 
   * Default
 
-    * ``$OMP_NUM_THREADS``
+    * Will use the number of threads set in ``mesa_mp_threads``, or if that is not set then will use the number set in ``$OMP_NUM_THREADS``.
 
   * Examples
 
