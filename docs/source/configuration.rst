@@ -61,6 +61,20 @@ Tells Megyr to output a summary of the MESA profile files for each model as a cs
 
     * ``mesa_profile_attributes.csv``
 
+gyre_oscillations_ad_summary_file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``str`` - [Optional]
+
+Tells Megyr to output a summary of the adiabatic oscillation summary files as a csv file. The adiabatic oscillation summary files must be set in the GYRE config template to be outputted to ``{{ad_output_summary_file}}``.
+
+  * Default
+
+    * ``None``
+
+  * Examples
+
+    * ``oscillations_ad.csv``
+
 Settings
 --------
 
