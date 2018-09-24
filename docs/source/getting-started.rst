@@ -83,3 +83,17 @@ You can see that for the ``initial_mass`` we are setting it to ``{{initial_mass}
 We can then execute our Megyr script by running the following command in the terminal. ::
 
     pipenv run python megyr_config.py
+
+You should then see output appear in the terminal from the MESA runs. Wait for the MESA runs for all three models to complete. You can then take a look at the files that MESA and Megyr outputted by running the following commands. ::
+
+    ls out
+    ls out/mesa_initial_mass_1__
+    less out/mesa_initial_mass_1__/mesa_profile_attributes.csv
+
+The ``mesa_profile_attributes.csv`` files that we had Megyr create for each model contain summary information from all of the profile files that MESA outputted.
+
+Now, if you try to rerun the Megyr script you will see one of the nice features of Megyr. ::
+
+    pipenv run python megyr_config.py
+
+You will notice that the MESA runs are not repeated, since Megyr notices that they have already been run. Megyr will keep the results from MESA and GYRE runs, and for any run that completed, Megyr will not rerun it and will instead work on the next task that has not yet been completed.
