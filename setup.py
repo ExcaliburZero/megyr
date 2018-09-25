@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+import setuptools
 
-setup(
-    name="Megyr",
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    name="megyr",
     version="0.2.0",
     description="Library for creating sccripts to automate MESA and GYRE runs.",
     author="Christopher Wells",
     author_email="cwells2@oswego.edu",
     url="https://github.com/ExcaliburZero/megyr",
     license="MIT",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=["megyr"],
     install_requires=["pandas", "pystache"],
 )
