@@ -8,7 +8,8 @@ setup(
     description="Library for creating sccripts to automate MESA and GYRE runs.",
     author="Christopher Wells",
     author_email="cwells2@oswego.edu",
-    url="",
+    url="https://github.com/ExcaliburZero/megyr",
+    license="MIT",
     packages=["megyr"],
     install_requires=["pandas", "pystache"],
 )
