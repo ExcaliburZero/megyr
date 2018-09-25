@@ -8,8 +8,6 @@ def validate_config(config):
 
     if should_run_gyre(config):
         assert_to_list(errors, nested_in(config, ["stages", "gyre_params"]), "[no_gyre_params] Could not find \"gyre_params\" setting in \"stages\" section of config. GYRE is set to run, but needs this setting to know what value combinations to try.")
-
-        assert_to_list(errors, nested_in(config, ["output", "gyre_oscillations_ad_summary_file"]), "[no_gyre_summary_file] Could not find \"gyre_oscillations_ad_summary_file\" setting in \"output\" section of config. GYRE is set to run, but Megyr needs this setting to know where to output the summary of the GYRE oscillation summary files.")
     else:
         # Check for GYRE settings present when GYRE is not set to run
         gyre_missing_msg = "[gyre_not_enabled] Found \"{}\" setting in \"{}\" section of config even though GYRE is not enabled. \"gyre_config\" in the \"input\" section must be specified in order to run GYRE."

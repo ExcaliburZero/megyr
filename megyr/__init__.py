@@ -53,22 +53,33 @@ def run(config):
             if config_validation.nested_in(config, ["settings", "gyre_mp_threads"]):
                 util.set_num_mp_threads(config["settings"]["gyre_mp_threads"])
 
-            oscillations = pd.DataFrame()
+            record_oscill_ad = config_validation.nested_in(config, ["output", "gyre_oscillations_ad_summary_file"])
+
+            oscillations_ad = util.DataFrameAggregator(
+                should_read=record_oscill_ad
+            )
             for gyre_comb in gyre_grid:
                 print("GYRE: " + str(gyre_comb))
                 ad_output_summary_file = gyre.run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
-                summary = oscillations_summary.read_oscillations_summary_file(ad_output_summary_file).data
+                def transform_oscillations(rows):
+                    for key in gyre_comb:
+                        v = gyre_comb[key]
 
-                for key in gyre_comb:
-                    v = gyre_comb[key]
+                        rows[key] = v
 
-                    summary[key] = v
+                    return rows
 
-                oscillations = pd.concat([oscillations, summary])
+                oscillations_ad.append_from_file(
+                    filepath=ad_output_summary_file,
+                    read_function=load_oscillations_file,
+                    transform_func=transform_oscillations
+                )
 
-            oscillations_file = os.path.join(output_dir, mesa_dir_name, config["output"]["gyre_oscillations_summary_file"])
-            oscillations.to_csv(oscillations_file, index=False)
+            if config_validation.nested_in(config, ["output", "gyre_oscillations_ad_summary_file"]):
+                oscillations_ad_file = os.path.join(output_dir, mesa_dir_name, config["output"]["gyre_oscillations_ad_summary_file"])
+
+                oscillations_ad.write_to_file(oscillations_ad_file)
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     filename = config["output"]["mesa_profile_summary_file"]
@@ -81,3 +92,6 @@ def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
         rows.to_csv(profiles_summary_file, index=False)
 
     return rows
+
+def load_oscillations_file(filepath):
+    return oscillations_summary.read_oscillations_summary_file(filepath).data

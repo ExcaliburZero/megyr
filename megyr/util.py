@@ -5,6 +5,7 @@ import os.path
 import subprocess
 import sys
 
+import pandas as pd
 import pystache
 
 COMPLETED_FILENAME = "completed.txt"
@@ -47,3 +48,22 @@ def set_num_mp_threads(num):
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
+
+class DataFrameAggregator(object):
+    def __init__(self, should_read):
+        self.data = pd.DataFrame()
+        self.should_read = should_read
+
+    def append_from_file(self, filepath, read_function=pd.read_csv, transform_func=lambda r: r):
+        if self.should_read:
+            new_rows = read_function(filepath)
+
+            transformed = transform_func(new_rows)
+
+            self.data = pd.concat([self.data, new_rows])
+
+    def write_to_file(self, filepath):
+        if self.should_read:
+            self.data.to_csv(filepath, index=False)
+        else:
+            raise Exception("Tried to write out DataFrameAggregator that has reading disabled.")
