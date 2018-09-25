@@ -45,6 +45,8 @@ def process_params(values, rows, raw_params):
                 params[key] = set(rows_filtered[then])
             else:
                 raise Exception()
+        else:
+            params[key] = set(value)
 
     return params
 

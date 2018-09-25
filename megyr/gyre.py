@@ -14,7 +14,7 @@ def run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa
     gyre_comb["ad_output_summary_file"] = gyre_ad_output_summary
 
     if not util.has_completed_file(mesa_dir, filename=gyre_completed):
-        derived = config["stages"]["gyre_derived"](mesa_comb, mesa_data, gyre_comb)
+        derived = extract_additional_values(config, mesa_comb, mesa_data, gyre_comb)
 
         gyre_config = create_gyre_config(config, mesa_comb, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name)
 
@@ -24,6 +24,12 @@ def run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa
         print("Already completed GYRE")
 
     return os.path.join(output_dir, mesa_dir_name, gyre_dir_name, gyre_ad_output_summary)
+
+def extract_additional_values(config, mesa_comb, mesa_data, gyre_comb):
+    if "gyre_derived" in config["stages"]:
+        return config["stages"]["gyre_derived"](mesa_comb, mesa_data, gyre_comb)
+
+    return dict(gyre_comb)
 
 def create_gyre_prefix(gyre_comb):
     name = "gyre_"
