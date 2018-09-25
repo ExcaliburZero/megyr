@@ -41,6 +41,22 @@ def should_run_gyre(config):
     return nested_in(config, ["input", "gyre_config"])
 
 def nested_in(config, nested_keys):
+    """
+    Checks if the given nested keys are within the given dict. Returns false if
+    any of the intermediate keys or the final key are not nested in the dict.
+
+    >>> config = {}
+    >>> nested_in(config, ["settings", "gyre_mp_threads"])
+    False
+
+    >>> config = {"settings": {}}
+    >>> nested_in(config, ["settings", "gyre_mp_threads"])
+    False
+
+    >>> config = {"settings": {"gyre_mp_threads": 4}}
+    >>> nested_in(config, ["settings", "gyre_mp_threads"])
+    True
+    """
     for key in nested_keys:
         if key in config:
             config = config[key]
@@ -54,6 +70,16 @@ def nested_put(config, nested_keys, value):
     Puts the given nested key value pair into the given dict. If any part of
     the nested key structure does not yet exist, then it will be created in the
     process.
+
+    >>> config = {}
+    >>> nested_put(config, ["key"], "value")
+    >>> config["key"]
+    'value'
+
+    >>> config = {}
+    >>> nested_put(config, ["settings", "gyre_mp_threads"], 2)
+    >>> config["settings"]["gyre_mp_threads"]
+    2
     """
     if len(nested_keys) == 0:
         raise Exception("Invalid number of nested keys.")

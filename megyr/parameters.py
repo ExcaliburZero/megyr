@@ -1,4 +1,15 @@
 def create_grid(values, rows, params):
+    """
+    Creates a grid of parameters using the given dict of possible parameter
+    values.
+
+    >>> grid = create_grid({}, [], { \
+            "a": [0, 1, 2], \
+            "b": ['a', "bob"] \
+        })
+    >>> sorted([sorted(x.items()) for x in grid])
+    [[('a', 0), ('b', 'a')], [('a', 0), ('b', 'bob')], [('a', 1), ('b', 'a')], [('a', 1), ('b', 'bob')], [('a', 2), ('b', 'a')], [('a', 2), ('b', 'bob')]]
+    """
     processed_params = process_params(values, rows, params)
 
     combinations = generate_param_combinations(processed_params)
