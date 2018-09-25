@@ -1,4 +1,4 @@
-# Megyr [![Documentation Status](https://readthedocs.org/projects/megyr/badge/?version=latest)](https://megyr.readthedocs.io/en/latest/?badge=latest)
+# Megyr [![Build Status](https://travis-ci.org/ExcaliburZero/megyr.svg?branch=master)](https://travis-ci.org/ExcaliburZero/megyr) [![Documentation Status](https://readthedocs.org/projects/megyr/badge/?version=latest)](https://megyr.readthedocs.io/en/latest/?badge=latest)
 Megyr is a Python library for creating scripts to automate MESA and GYRE runs over grids of parameter values. It provides a main function that you can run with a set of configuration settings to determine how to run MESA and GYRE and what values to use for the different models.
 
 ```python
