@@ -67,13 +67,18 @@ gyre_oscillations_ad_summary_file
 
 Tells Megyr to output a summary of the adiabatic oscillation summary files as a csv file. The adiabatic oscillation summary files must be set in the GYRE config template to be outputted to ``{{ad_output_summary_file}}``.
 
-  * Default
+For example, the GYRE config file template should have settings like the following in the ``ad_output`` section. ::
 
-    * ``None``
+    summary_file = '{{ad_output_summary_file}}'
+    summary_file_format = 'TXT'
 
-  * Examples
+* Default
 
-    * ``oscillations_ad.csv``
+  * ``None``
+
+* Examples
+
+  * ``oscillations_ad.csv``
 
 Settings
 --------
