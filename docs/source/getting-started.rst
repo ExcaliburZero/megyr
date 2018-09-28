@@ -260,3 +260,12 @@ Now we can simply run the Megyr script in the same way that we did before. ::
 
     pipenv run python megyr_config.py
 
+Once Megyr finishes running, we can take a look at the summary files that Megyr created for the adiabatic oscillations found in the GYRE runs by running the following commands. ::
+
+    ls out/mesa_initial_mass_1__/
+    less out/mesa_initial_mass_1__/oscillations_ad.csv
+
+Summary
+-------
+
+In this tutorial we created a simple Megyr project where we ran MESA and GYRE over a few models with differing parameters. The general pattern we used can be adjusted to run MESA and GYRE with a different grid of parameters.
