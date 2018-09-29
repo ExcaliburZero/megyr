@@ -72,7 +72,7 @@ def run(config):
 
                 oscillations_ad.append_from_file(
                     filepath=ad_output_summary_file,
-                    read_function=load_oscillations_file,
+                    read_function=load_ad_summary_file,
                     transform_func=transform_oscillations
                 )
 
@@ -93,5 +93,26 @@ def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
 
     return rows
 
-def load_oscillations_file(filepath):
-    return oscillations_summary.read_oscillations_summary_file(filepath).data
+def load_oscillations_file(filepath, file_not_found_handler=None):
+    try:
+        return oscillations_summary.read_oscillations_summary_file(filepath).data
+    except FileNotFoundError as e:
+        if file_not_found_handler is not None:
+            file_not_found_handler(filepath)
+        else:
+            raise e
+
+def load_ad_summary_file(filepath):
+    return load_oscillations_file(
+        filepath,
+        file_not_found_handler=handle_missing_ad_summary
+    )
+
+def handle_missing_ad_summary(filepath):
+    util.print_runtime_error_divider()
+
+    util.eprint("[missing_ad_summary_file] Failed to load adiabatic oscillation summary file: {}\n".format(filepath))
+    util.eprint("Make sure that you are using the correct filepath for 'summary_file' in your GYRE config file.\n")
+    util.eprint("See the configuration documentation for the 'gyre_oscillations_ad_summary_file' config value for more info.")
+
+    sys.exit(1)

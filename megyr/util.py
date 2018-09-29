@@ -49,6 +49,9 @@ def set_num_mp_threads(num):
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
+def print_runtime_error_divider():
+    eprint("------------------------")
+
 class DataFrameAggregator(object):
     def __init__(self, should_read):
         self.data = pd.DataFrame()
