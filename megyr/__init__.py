@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import os.path
 import sys
@@ -18,17 +19,14 @@ def run(config):
     config_validation.set_defaults(config)
 
     if len(config_errors) > 0:
-        util.eprint("Found {} config errors.\n".format(len(config_errors)))
-
-        for i in range(1, len(config_errors) + 1):
-            util.eprint("{}) {}\n".format(i, config_errors[i - 1]))
-
-        sys.exit(1)
+        handle_config_errors(config_errors)
 
     work_dir = "."
     output_dir = os.path.join(work_dir, config["output"]["output_dir"])
 
     util.create_dir(output_dir)
+
+    completed_tasks, completed_filepath = get_completed_tasks(config)
 
     mesa_params = config["stages"]["mesa_params"]
     mesa_grid = parameters.create_grid({}, [], mesa_params)
@@ -39,7 +37,14 @@ def run(config):
         if config_validation.nested_in(config, ["settings", "mesa_mp_threads"]):
             util.set_num_mp_threads(config["settings"]["mesa_mp_threads"])
 
-        mesa_dir_name, logs_dir_name = mesa.run_mesa(config, mesa_comb, work_dir, output_dir)
+        mesa_dir_name = mesa.create_mesa_dir_name(mesa_comb)
+        logs_dir_name = "LOGS"
+
+        if task_not_completed(completed_tasks, mesa_dir_name):
+            mesa_task = lambda: mesa.run_mesa(config, mesa_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+            run_task(completed_filepath, completed_tasks, mesa_dir_name, mesa_task)
+        else:
+            print("Already completed MESA")
 
         mesa_data = load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name)
 
@@ -60,7 +65,13 @@ def run(config):
             )
             for gyre_comb in gyre_grid:
                 print("GYRE: " + str(gyre_comb))
-                ad_output_summary_file = gyre.run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+                gyre_dir_name = "gyre"
+                gyre_prefix = gyre.create_gyre_prefix(gyre_comb)
+
+                gyre_task_name = mesa_dir_name + "-" + gyre_prefix
+
+                ad_output_summary = "summary_" + gyre_prefix + ".txt"
+                ad_output_summary_file = os.path.join(output_dir, mesa_dir_name, gyre_dir_name, ad_output_summary)
 
                 def transform_oscillations(rows):
                     for key in gyre_comb:
@@ -70,16 +81,35 @@ def run(config):
 
                     return rows
 
-                oscillations_ad.append_from_file(
+                read_ad = lambda: oscillations_ad.append_from_file(
                     filepath=ad_output_summary_file,
                     read_function=load_ad_summary_file,
                     transform_func=transform_oscillations
                 )
 
+                if task_not_completed(completed_tasks, gyre_task_name):
+                    def gyre_task():
+                        gyre.run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name, gyre_prefix, ad_output_summary)
+                        read_ad()
+
+                    run_task(completed_filepath, completed_tasks, gyre_task_name, gyre_task)
+                else:
+                    print("Already completed GYRE")
+
+                    read_ad()
+
             if config_validation.nested_in(config, ["output", "gyre_oscillations_ad_summary_file"]):
                 oscillations_ad_file = os.path.join(output_dir, mesa_dir_name, config["output"]["gyre_oscillations_ad_summary_file"])
 
                 oscillations_ad.write_to_file(oscillations_ad_file)
+
+def handle_config_errors(config_errors):
+    util.eprint("Found {} config errors.\n".format(len(config_errors)))
+
+    for i in range(1, len(config_errors) + 1):
+        util.eprint("{}) {}\n".format(i, config_errors[i - 1]))
+
+    sys.exit(1)
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     filename = config["output"]["mesa_profile_summary_file"]
@@ -116,3 +146,42 @@ def handle_missing_ad_summary(filepath):
     util.eprint("See the configuration documentation for the 'gyre_oscillations_ad_summary_file' config value for more info.")
 
     sys.exit(1)
+
+def get_completed_tasks(config):
+    completed_filepath = "completed_tasks.csv"
+
+    try:
+        return pd.read_csv(completed_filepath), completed_filepath
+    except FileNotFoundError:
+        completed = pd.DataFrame({
+            "task_name": [],
+            "start": [],
+            "end": [],
+            "duration": []
+        })
+
+        completed.to_csv(completed_filepath, index=False)
+
+        return completed, completed_filepath
+
+def task_not_completed(completed, task_name):
+    return task_name not in list(completed["task_name"])
+
+def run_task(filepath, completed, task_name, task_function):
+    start = datetime.datetime.now()
+    task_function()
+    end = datetime.datetime.now()
+
+    duration = (end - start).seconds
+
+    completed.append(pd.DataFrame({
+        "task_name": [task_name],
+        "start": [start],
+        "end": [end],
+        "duration": [duration]
+    }))
+
+    with open(filepath, "a") as f:
+        new_row = ",".join([task_name, str(start), str(end), str(duration)])
+
+        f.write(new_row + "\n")

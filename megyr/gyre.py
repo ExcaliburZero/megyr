@@ -2,28 +2,19 @@ import os.path
 
 from . import util
 
-def run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
+def run_gyre(config, mesa_comb, mesa_data, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_dir_name, gyre_prefix, gyre_ad_output_summary):
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
-    gyre_dir_name = create_gyre_dir(mesa_dir)
 
-    gyre_prefix = create_gyre_prefix(gyre_comb)
+    gyre_dir = os.path.join(mesa_dir, gyre_dir_name)
+    util.create_dir(gyre_dir)
 
-    gyre_completed = os.path.join(gyre_dir_name, "completed_" + gyre_prefix + ".txt")
+    derived = extract_additional_values(config, mesa_comb, mesa_data, gyre_comb)
 
-    gyre_ad_output_summary = "summary_" + gyre_prefix + ".txt"
-    gyre_comb["ad_output_summary_file"] = gyre_ad_output_summary
+    derived["ad_output_summary_file"] = gyre_ad_output_summary
 
-    if not util.has_completed_file(mesa_dir, filename=gyre_completed):
-        derived = extract_additional_values(config, mesa_comb, mesa_data, gyre_comb)
+    gyre_config = create_gyre_config(config, mesa_comb, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name)
 
-        gyre_config = create_gyre_config(config, mesa_comb, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name)
-
-        exec_gyre(config["settings"]["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
-        util.create_completed_file(mesa_dir, filename=gyre_completed)
-    else:
-        print("Already completed GYRE")
-
-    return os.path.join(output_dir, mesa_dir_name, gyre_dir_name, gyre_ad_output_summary)
+    exec_gyre(config["settings"]["gyre_location"], output_dir, mesa_dir_name, gyre_dir_name, gyre_config)
 
 def extract_additional_values(config, mesa_comb, mesa_data, gyre_comb):
     if "gyre_derived" in config["stages"]:
@@ -37,15 +28,6 @@ def create_gyre_prefix(gyre_comb):
         name += key + "_" + str(gyre_comb[key]) + "__"
 
     return name
-
-def create_gyre_dir(mesa_dir):
-    gyre_dir_name = "gyre"
-
-    gyre_dir = os.path.join(mesa_dir, gyre_dir_name)
-
-    util.create_dir(gyre_dir)
-
-    return gyre_dir_name
 
 def create_gyre_config(config, mesa_comb, gyre_comb, work_dir, output_dir, mesa_dir_name, logs_dir_name, gyre_prefix, gyre_dir_name):
     end = -1 * len(".mustache")

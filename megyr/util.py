@@ -8,8 +8,6 @@ import sys
 import pandas as pd
 import pystache
 
-COMPLETED_FILENAME = "completed.txt"
-
 MP_THREADS_ENV_VAR = "OMP_NUM_THREADS"
 
 def create_dir(path):
@@ -29,17 +27,6 @@ def load_py_module_from_file(name, filepath):
     spec.loader.exec_module(new_module)
 
     return new_module
-
-def has_completed_file(directory, filename=COMPLETED_FILENAME):
-    filepath = os.path.join(directory, filename)
-
-    return os.path.isfile(filepath)
-
-def create_completed_file(directory, filename=COMPLETED_FILENAME):
-    filepath = os.path.join(directory, filename)
-
-    with open(filepath, "w") as f:
-        f.write(str(datetime.datetime.now()))
 
 def set_num_mp_threads(num):
     assert(num > 0)

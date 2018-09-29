@@ -5,33 +5,22 @@ import pandas as pd
 from . import profile
 from . import util
 
-def run_mesa(config, comb, work_dir, output_dir):
-    mesa_dir_name = create_mesa_dir(config, comb, output_dir)
-
-    logs_dir_name = setup_mesa_dir(output_dir, mesa_dir_name)
-
+def run_mesa(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
-    if not util.has_completed_file(mesa_dir):
-        derived = extract_additional_values(config, comb)
+    util.create_dir(mesa_dir)
 
-        create_mesa_configs(config, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+    setup_mesa_dir(output_dir, mesa_dir_name, logs_dir_name)
 
-        exec_mesa(config, work_dir, output_dir, mesa_dir_name)
+    derived = extract_additional_values(config, comb)
 
-        util.create_completed_file(mesa_dir)
-    else:
-        print("Already completed MESA")
+    create_mesa_configs(config, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name)
 
-    return mesa_dir_name, logs_dir_name
+    exec_mesa(config, work_dir, output_dir, mesa_dir_name)
 
-def create_mesa_dir(config, comb, output_dir):
+def create_mesa_dir_name(comb):
     dir_name = "mesa_"
     for key in sorted(comb.keys()):
         dir_name += key + "_" + str(comb[key]) + "__"
-
-    mesa_dir = os.path.join(output_dir, dir_name)
-
-    util.create_dir(mesa_dir)
 
     return dir_name
 
@@ -41,8 +30,7 @@ def extract_additional_values(config, mesa_comb):
 
     return dict(mesa_comb)
 
-def setup_mesa_dir(output_dir, mesa_dir_name):
-    logs_dir_name = "LOGS"
+def setup_mesa_dir(output_dir, mesa_dir_name, logs_dir_name):
     logs_dir = os.path.join(output_dir, mesa_dir_name, logs_dir_name)
 
     util.create_dir(logs_dir)
