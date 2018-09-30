@@ -23,6 +23,17 @@ def extract_additional_values(config, mesa_comb, mesa_data, gyre_comb):
     return dict(gyre_comb)
 
 def create_gyre_prefix(gyre_comb):
+    """
+    Creates a GYRE run prefix to use for the given combination of GYRE
+    parameter values. These prefixes should be unique within one MESA run, but
+    can be repeated across multiple, separate, MESA runs.
+
+    This also needs to be deterministic, reguardless of the fact that the dict
+    passed in is unordered.
+
+    >>> create_gyre_prefix({"a": 2, "c": 3, "b": "hi"})
+    'gyre_a_2__b_hi__c_3__'
+    """
     name = "gyre_"
     for key in sorted(gyre_comb.keys()):
         name += key + "_" + str(gyre_comb[key]) + "__"

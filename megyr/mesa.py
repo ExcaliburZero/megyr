@@ -18,6 +18,16 @@ def run_mesa(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     exec_mesa(config, work_dir, output_dir, mesa_dir_name)
 
 def create_mesa_dir_name(comb):
+    """
+    Creates a MESA run dir name to use for the given combination of MESA
+    parameter values. These prefixes should be unique for each MESA run.
+
+    This also needs to be deterministic, reguardless of the fact that the dict
+    passed in is unordered.
+
+    >>> create_mesa_dir_name({"a": 2, "c": 3, "b": "hi"})
+    'mesa_a_2__b_hi__c_3__'
+    """
     dir_name = "mesa_"
     for key in sorted(comb.keys()):
         dir_name += key + "_" + str(comb[key]) + "__"
