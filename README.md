@@ -11,7 +11,7 @@ def main():
             "gyre_config": "gyre.in.mustache"
         },
         "output": {
-            "gyre_oscillations_summary_file": "oscillations.csv"
+            "gyre_oscillations_ad_summary_file": "oscillations_ad.csv"
         },
         "settings": {
             "mesa_star_location": "star",
