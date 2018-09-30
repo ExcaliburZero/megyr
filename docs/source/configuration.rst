@@ -49,17 +49,20 @@ The directory that Megyr will place all of the temporary and output files and di
 
 mesa_profile_summary_file
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-``str`` - [Optional]
+``str`` or ``None`` - [Optional]
 
-Tells Megyr to output a summary of the MESA profile files for each model as a csv file.
+Tells Megyr where to output a summary of the MESA profile files for each model as a csv file. To set Megyr not to output this kind of summary file, you can set this config value to ``None``.
+
+These summary values are also used by MESA to speed up re-runs, as they allow it to lookup all of the MESA profile information from one file instead of having to aggregate together all of the outputted profile files again.
 
   * Default
 
-    * ``None``
+    * ``mesa_profile_attributes.csv``
 
   * Examples
 
-    * ``mesa_profile_attributes.csv``
+    * ``mesa_profiles.csv``
+    * ``None``
 
 gyre_oscillations_ad_summary_file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

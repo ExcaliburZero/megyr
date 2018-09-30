@@ -113,13 +113,16 @@ def handle_config_errors(config_errors):
 
 def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     filename = config["output"]["mesa_profile_summary_file"]
-    profiles_summary_file = os.path.join(output_dir, mesa_dir_name, filename)
-    if os.path.isfile(profiles_summary_file):
-        rows = pd.read_csv(profiles_summary_file)
+
+    get_summary_file_name = lambda: os.path.join(output_dir, mesa_dir_name, filename)
+
+    if filename is not None and os.path.isfile(get_summary_file_name()):
+        rows = pd.read_csv(get_summary_file_name())
     else:
         rows = mesa.get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name)
 
-        rows.to_csv(profiles_summary_file, index=False)
+        if filename is not None:
+            rows.to_csv(get_summary_file_name(), index=False)
 
     return rows
 

@@ -20,9 +20,14 @@ def validate_config(config):
     return errors
 
 def set_defaults(config):
+    ### Output
     if not nested_in(config, ["output", "output_dir"]):
         nested_put(config, ["output", "output_dir"], "out")
 
+    if not nested_in(config, ["output", "mesa_profile_summary_file"]):
+        nested_put(config, ["output", "mesa_profile_summary_file"], "mesa_profile_attributes.csv")
+
+    ### Settings
     if not nested_in(config, ["settings", "mesa_star_location"]):
         nested_put(config, ["settings", "mesa_star_location"], "star")
 
