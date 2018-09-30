@@ -11,7 +11,6 @@ def main():
             "gyre_config": "gyre.in.mustache"
         },
         "output": {
-            "mesa_profile_summary_file": "mesa_profile_attributes.csv",
             "gyre_oscillations_summary_file": "oscillations.csv"
         },
         "settings": {
