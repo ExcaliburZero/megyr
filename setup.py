@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="megyr",
-    version="0.2.0",
+    version="0.2.1",
     description="A library for creating scripts to automate MESA and GYRE runs.",
     author="Christopher Wells",
     author_email="cwells2@oswego.edu",
