@@ -29,7 +29,12 @@ def run(config):
     completed_tasks, completed_filepath = get_completed_tasks(config)
 
     mesa_params = config["stages"]["mesa_params"]
-    mesa_grid = parameters.create_grid({}, [], mesa_params)
+
+    # Get or calculate the mesa param grid
+    if isinstance(mesa_params, dict):
+        mesa_grid = parameters.create_grid({}, [], mesa_params)
+    else:
+        mesa_grid = mesa_params
 
     for mesa_comb in mesa_grid:
         print("MESA: " + str(mesa_comb))

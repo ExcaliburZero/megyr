@@ -139,9 +139,11 @@ Stages
 
 mesa_params
 ^^^^^^^^^^^
-``dict``
+``dict`` or ``list[dict]``
 
-The parameter value possibilities to use to construct the grid of MESA models to run.
+If a dictionary, the parameter value possibilities to use to construct the grid of MESA models to run.
+
+If a list, the parameter value combinations of the models to run.
 
   * Examples
 
@@ -152,6 +154,12 @@ The parameter value possibilities to use to construct the grid of MESA models to
         "y": [1.0, 1.2, 2.5],
         "initial_mass": [1, 5]
     }
+
+    # Use 2 models with different y and initial mass values
+    [
+        { "y": 0.27, "initial_mass": 1 },
+        { "y": 0.30, "initial_mass": 1.5 }
+    ]
 
 mesa_derived
 ^^^^^^^^^^^^
