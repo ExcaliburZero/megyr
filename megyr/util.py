@@ -10,15 +10,19 @@ import pystache
 
 MP_THREADS_ENV_VAR = "OMP_NUM_THREADS"
 
+
 def create_dir(path):
     os.makedirs(path, exist_ok=True)
+
 
 def run_in_dir(command, directory):
     subprocess.check_call(command, cwd=directory, shell=True)
 
+
 def render_mustache_file(f, values):
     renderer = pystache.Renderer()
     return renderer.render_path(f, values)
+
 
 def load_py_module_from_file(name, filepath):
     spec = importlib.util.spec_from_file_location(name, filepath)
@@ -28,23 +32,29 @@ def load_py_module_from_file(name, filepath):
 
     return new_module
 
+
 def set_num_mp_threads(num):
-    assert(num > 0)
+    assert num > 0
 
     os.environ[MP_THREADS_ENV_VAR] = str(num)
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
+
 def print_runtime_error_divider():
     eprint("------------------------")
+
 
 class DataFrameAggregator(object):
     def __init__(self, should_read):
         self.data = pd.DataFrame()
         self.should_read = should_read
 
-    def append_from_file(self, filepath, read_function=pd.read_csv, transform_func=lambda r: r):
+    def append_from_file(
+        self, filepath, read_function=pd.read_csv, transform_func=lambda r: r
+    ):
         if self.should_read:
             new_rows = read_function(filepath)
 
@@ -56,4 +66,6 @@ class DataFrameAggregator(object):
         if self.should_read:
             self.data.to_csv(filepath, index=False)
         else:
-            raise Exception("Tried to write out DataFrameAggregator that has reading disabled.")
+            raise Exception(
+                "Tried to write out DataFrameAggregator that has reading disabled."
+            )

@@ -16,6 +16,7 @@ def create_grid(values, rows, params):
 
     return combinations
 
+
 def process_params(values, rows, raw_params):
     params = {}
     for key in raw_params:
@@ -24,19 +25,21 @@ def process_params(values, rows, raw_params):
         if isinstance(value, list):
             params[key] = set(value)
         elif isinstance(value, dict):
-            assert("type" in value)
+            assert "type" in value
             if value["type"] == "where":
-                assert("check" in value)
-                assert("then" in value)
+                assert "check" in value
+                assert "then" in value
 
-                assert(
-                    "gte" in value or "gt" in value or
-                    "lte" in value or "lt" in value or
-                    "eq" in value
+                assert (
+                    "gte" in value
+                    or "gt" in value
+                    or "lte" in value
+                    or "lt" in value
+                    or "eq" in value
                 )
 
-                assert(value["check"] in rows.columns)
-                assert(value["then"] in rows.columns)
+                assert value["check"] in rows.columns
+                assert value["then"] in rows.columns
 
                 check = value["check"]
                 then = value["then"]
@@ -61,6 +64,7 @@ def process_params(values, rows, raw_params):
 
     return params
 
+
 def generate_param_combinations(params):
     remaining = list(params.keys())
     chosen = {}
@@ -69,6 +73,7 @@ def generate_param_combinations(params):
     generate_param_combinations_h(params, remaining, chosen, combinations)
 
     return combinations
+
 
 def generate_param_combinations_h(params, remaining, chosen, combinations):
     if len(remaining) == 0:
@@ -83,4 +88,3 @@ def generate_param_combinations_h(params, remaining, chosen, combinations):
         new_chosen[p] = v
 
         generate_param_combinations_h(params, remaining[1:], new_chosen, combinations)
-
