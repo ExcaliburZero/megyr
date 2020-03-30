@@ -5,6 +5,7 @@ import pandas as pd
 from . import profile
 from . import util
 
+
 def run_mesa(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
     util.create_dir(mesa_dir)
@@ -13,9 +14,12 @@ def run_mesa(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
 
     derived = extract_additional_values(config, comb)
 
-    create_mesa_configs(config, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name)
+    create_mesa_configs(
+        config, derived, work_dir, output_dir, mesa_dir_name, logs_dir_name
+    )
 
     exec_mesa(config, work_dir, output_dir, mesa_dir_name)
+
 
 def create_mesa_dir_name(comb):
     """
@@ -34,11 +38,13 @@ def create_mesa_dir_name(comb):
 
     return dir_name
 
+
 def extract_additional_values(config, mesa_comb):
     if "mesa_derived" in config["stages"]:
         return config["stages"]["mesa_derived"](mesa_comb)
 
     return dict(mesa_comb)
+
 
 def setup_mesa_dir(output_dir, mesa_dir_name, logs_dir_name):
     logs_dir = os.path.join(output_dir, mesa_dir_name, logs_dir_name)
@@ -47,7 +53,10 @@ def setup_mesa_dir(output_dir, mesa_dir_name, logs_dir_name):
 
     return logs_dir_name
 
-def create_mesa_configs(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
+
+def create_mesa_configs(
+    config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name
+):
     end = -1 * len(".mustache")
 
     for config_file in config["input"]["mesa_configs"]:
@@ -62,14 +71,16 @@ def create_mesa_configs(config, comb, work_dir, output_dir, mesa_dir_name, logs_
         with open(config_file_out, "w") as out:
             out.write(applied_contents)
 
+
 def exec_mesa(config, work_dir, output_dir, mesa_dir_name):
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
 
     mesa_command = os.path.abspath(
-	os.path.join(work_dir, config["settings"]["mesa_star_location"])
+        os.path.join(work_dir, config["settings"]["mesa_star_location"])
     )
 
     util.run_in_dir(mesa_command, mesa_dir)
+
 
 def get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     logs_dir = os.path.join(output_dir, mesa_dir_name, logs_dir_name)
