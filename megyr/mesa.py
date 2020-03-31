@@ -1,3 +1,5 @@
+from typing import Any, cast, Dict
+
 import os.path
 
 import pandas as pd
@@ -6,7 +8,14 @@ from . import profile
 from . import util
 
 
-def run_mesa(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
+def run_mesa(
+    config: Dict[str, Any],
+    comb: Dict[str, Any],
+    work_dir: str,
+    output_dir: str,
+    mesa_dir_name: str,
+    logs_dir_name: str,
+) -> None:
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
     util.create_dir(mesa_dir)
 
@@ -21,7 +30,7 @@ def run_mesa(config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name):
     exec_mesa(config, work_dir, output_dir, mesa_dir_name)
 
 
-def create_mesa_dir_name(comb):
+def create_mesa_dir_name(comb: Dict[str, Any]) -> str:
     """
     Creates a MESA run dir name to use for the given combination of MESA
     parameter values. These prefixes should be unique for each MESA run.
@@ -39,14 +48,16 @@ def create_mesa_dir_name(comb):
     return dir_name
 
 
-def extract_additional_values(config, mesa_comb):
+def extract_additional_values(
+    config: Dict[str, Any], mesa_comb: Dict[str, Any]
+) -> Dict[str, Any]:
     if "mesa_derived" in config["stages"]:
-        return config["stages"]["mesa_derived"](mesa_comb)
+        return cast(Dict[str, Any], config["stages"]["mesa_derived"](mesa_comb))
 
     return dict(mesa_comb)
 
 
-def setup_mesa_dir(output_dir, mesa_dir_name, logs_dir_name):
+def setup_mesa_dir(output_dir: str, mesa_dir_name: str, logs_dir_name: str) -> str:
     logs_dir = os.path.join(output_dir, mesa_dir_name, logs_dir_name)
 
     util.create_dir(logs_dir)
@@ -55,8 +66,13 @@ def setup_mesa_dir(output_dir, mesa_dir_name, logs_dir_name):
 
 
 def create_mesa_configs(
-    config, comb, work_dir, output_dir, mesa_dir_name, logs_dir_name
-):
+    config: Dict[str, Any],
+    comb: Dict[str, Any],
+    work_dir: str,
+    output_dir: str,
+    mesa_dir_name: str,
+    logs_dir_name: str,
+) -> None:
     end = -1 * len(".mustache")
 
     for config_file in config["input"]["mesa_configs"]:
@@ -72,7 +88,9 @@ def create_mesa_configs(
             out.write(applied_contents)
 
 
-def exec_mesa(config, work_dir, output_dir, mesa_dir_name):
+def exec_mesa(
+    config: Dict[str, Any], work_dir: str, output_dir: str, mesa_dir_name: str
+) -> None:
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
 
     mesa_command = os.path.abspath(
@@ -82,7 +100,9 @@ def exec_mesa(config, work_dir, output_dir, mesa_dir_name):
     util.run_in_dir(mesa_command, mesa_dir)
 
 
-def get_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
+def get_mesa_data(
+    config: Dict[str, Any], output_dir: str, mesa_dir_name: str, logs_dir_name: str
+) -> "pd.DataFrame":
     logs_dir = os.path.join(output_dir, mesa_dir_name, logs_dir_name)
 
     profile_index_name = "profiles.index"

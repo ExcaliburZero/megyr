@@ -17,7 +17,7 @@ def create_dir(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
-def run_in_dir(command: List[str], directory: str) -> None:
+def run_in_dir(command: str, directory: str) -> None:
     subprocess.check_call(command, cwd=directory, shell=True)
 
 
