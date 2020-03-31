@@ -1,5 +1,8 @@
-def validate_config(config):
-    errors = []
+from typing import Any, Dict, List
+
+
+def validate_config(config: Dict[str, Any]) -> List[str]:
+    errors: List[str] = []
 
     assert_to_list(
         errors,
@@ -56,7 +59,7 @@ def validate_config(config):
     return errors
 
 
-def set_defaults(config):
+def set_defaults(config: Dict[str, Any]) -> None:
     ### Output
     if not nested_in(config, ["output", "output_dir"]):
         nested_put(config, ["output", "output_dir"], "out")
@@ -85,16 +88,16 @@ def set_defaults(config):
         )
 
 
-def assert_to_list(errors, condition, message):
+def assert_to_list(errors: List[str], condition: bool, message: str) -> None:
     if not condition:
         errors.append((message))
 
 
-def should_run_gyre(config):
+def should_run_gyre(config: Dict[str, Any]) -> bool:
     return nested_in(config, ["input", "gyre_config"])
 
 
-def nested_in(config, nested_keys):
+def nested_in(config: Dict[str, Any], nested_keys: List[str]) -> bool:
     """
     Checks if the given nested keys are within the given dict. Returns false if
     any of the intermediate keys or the final key are not nested in the dict.
@@ -120,7 +123,7 @@ def nested_in(config, nested_keys):
     return True
 
 
-def nested_put(config, nested_keys, value):
+def nested_put(config: Dict[str, Any], nested_keys: List[str], value: Any) -> None:
     """
     Puts the given nested key value pair into the given dict. If any part of
     the nested key structure does not yet exist, then it will be created in the
