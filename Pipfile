@@ -11,6 +11,7 @@ pystache = "*"
 sphinx = "*"
 nose = "*"
 black = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.6"
