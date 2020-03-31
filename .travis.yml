@@ -9,4 +9,5 @@ install:
 
 script:
   - pipenv run nosetests --with-doctest
-  - pipenv run python -m black megyr/*.py --check
+  - pipenv run black megyr/*.py --check
+  - pipenv run mypy megyr/*.py --ignore-missing-imports --strict

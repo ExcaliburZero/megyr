@@ -1,3 +1,5 @@
+from typing import Any, Callable, cast, Dict, List
+
 import datetime
 import importlib.util
 import os
@@ -11,50 +13,44 @@ import pystache
 MP_THREADS_ENV_VAR = "OMP_NUM_THREADS"
 
 
-def create_dir(path):
+def create_dir(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
-def run_in_dir(command, directory):
+def run_in_dir(command: str, directory: str) -> None:
     subprocess.check_call(command, cwd=directory, shell=True)
 
 
-def render_mustache_file(f, values):
+def render_mustache_file(f: str, values: Dict[str, str]) -> str:
     renderer = pystache.Renderer()
-    return renderer.render_path(f, values)
+    return cast(str, renderer.render_path(f, values))
 
 
-def load_py_module_from_file(name, filepath):
-    spec = importlib.util.spec_from_file_location(name, filepath)
-    new_module = importlib.util.module_from_spec(spec)
-
-    spec.loader.exec_module(new_module)
-
-    return new_module
-
-
-def set_num_mp_threads(num):
+def set_num_mp_threads(num: int) -> None:
     assert num > 0
 
     os.environ[MP_THREADS_ENV_VAR] = str(num)
 
 
-def eprint(*args, **kwargs):
+def eprint(*args: Any, **kwargs: Any) -> None:
     print(*args, file=sys.stderr, **kwargs)
 
 
-def print_runtime_error_divider():
+def print_runtime_error_divider() -> None:
     eprint("------------------------")
 
 
-class DataFrameAggregator(object):
-    def __init__(self, should_read):
+class DataFrameAggregator:
+    def __init__(self, should_read: bool) -> None:
         self.data = pd.DataFrame()
         self.should_read = should_read
 
     def append_from_file(
-        self, filepath, read_function=pd.read_csv, transform_func=lambda r: r
-    ):
+        self,
+        filepath: str,
+        read_function: Callable[[str], pd.DataFrame] = pd.read_csv,
+        transform_func: Callable[[pd.DataFrame], pd.DataFrame] = lambda r: r,
+    ) -> None:
         if self.should_read:
             new_rows = read_function(filepath)
 
@@ -62,7 +58,7 @@ class DataFrameAggregator(object):
 
             self.data = pd.concat([self.data, new_rows])
 
-    def write_to_file(self, filepath):
+    def write_to_file(self, filepath: str) -> None:
         if self.should_read:
             self.data.to_csv(filepath, index=False)
         else:

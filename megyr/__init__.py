@@ -1,3 +1,5 @@
+from typing import Any, Callable, cast, Dict, List, Optional, Tuple
+
 import argparse
 import datetime
 import json
@@ -14,7 +16,7 @@ from . import parameters
 from . import util
 
 
-def run(config):
+def run(config: Dict[str, Any]) -> None:
     config_errors = config_validation.validate_config(config)
 
     config_validation.set_defaults(config)
@@ -33,7 +35,7 @@ def run(config):
 
     # Get or calculate the mesa param grid
     if isinstance(mesa_params, dict):
-        mesa_grid = parameters.create_grid({}, [], mesa_params)
+        mesa_grid = parameters.create_grid([], mesa_params)
     else:
         mesa_grid = mesa_params
 
@@ -63,7 +65,7 @@ def run(config):
         if config_validation.should_run_gyre(config):
             gyre_params = config["stages"]["gyre_params"](mesa_params, mesa_data)
 
-            gyre_grid = parameters.create_grid({}, mesa_data, gyre_params)
+            gyre_grid = parameters.create_grid(mesa_data, gyre_params)
 
             if config_validation.nested_in(config, ["settings", "gyre_mp_threads"]):
                 util.set_num_mp_threads(config["settings"]["gyre_mp_threads"])
@@ -85,7 +87,7 @@ def run(config):
                     output_dir, mesa_dir_name, gyre_dir_name, ad_output_summary
                 )
 
-                def transform_oscillations(rows):
+                def transform_oscillations(rows: pd.DataFrame) -> pd.DataFrame:
                     for key in gyre_comb:
                         v = gyre_comb[key]
 
@@ -93,7 +95,7 @@ def run(config):
 
                     return rows
 
-                read_ad = lambda: oscillations_ad.append_from_file(
+                read_ad: Callable[[], None] = lambda: oscillations_ad.append_from_file(
                     filepath=ad_output_summary_file,
                     read_function=load_ad_summary_file,
                     transform_func=transform_oscillations,
@@ -101,7 +103,7 @@ def run(config):
 
                 if task_not_completed(completed_tasks, gyre_task_name):
 
-                    def gyre_task():
+                    def gyre_task() -> None:
                         gyre.run_gyre(
                             config,
                             mesa_comb,
@@ -137,7 +139,7 @@ def run(config):
                 oscillations_ad.write_to_file(oscillations_ad_file)
 
 
-def handle_config_errors(config_errors):
+def handle_config_errors(config_errors: List[str]) -> None:
     util.eprint("Found {} config errors.\n".format(len(config_errors)))
 
     for i in range(1, len(config_errors) + 1):
@@ -146,10 +148,14 @@ def handle_config_errors(config_errors):
     sys.exit(1)
 
 
-def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
-    filename = config["output"]["mesa_profile_summary_file"]
+def load_or_collect_mesa_data(
+    config: Dict[str, Any], output_dir: str, mesa_dir_name: str, logs_dir_name: str
+) -> pd.DataFrame:
+    filename = cast(str, config["output"]["mesa_profile_summary_file"])
 
-    get_summary_file_name = lambda: os.path.join(output_dir, mesa_dir_name, filename)
+    get_summary_file_name: Callable[[], str] = lambda: os.path.join(
+        output_dir, mesa_dir_name, filename
+    )
 
     if filename is not None and os.path.isfile(get_summary_file_name()):
         rows = pd.read_csv(get_summary_file_name())
@@ -162,7 +168,9 @@ def load_or_collect_mesa_data(config, output_dir, mesa_dir_name, logs_dir_name):
     return rows
 
 
-def load_oscillations_file(filepath, file_not_found_handler=None):
+def load_oscillations_file(
+    filepath: str, file_not_found_handler: Optional[Callable[[str], None]] = None
+) -> pd.DataFrame:
     try:
         return oscillations_summary.read_oscillations_summary_file(filepath).data
     except FileNotFoundError as e:
@@ -172,13 +180,13 @@ def load_oscillations_file(filepath, file_not_found_handler=None):
             raise e
 
 
-def load_ad_summary_file(filepath):
+def load_ad_summary_file(filepath: str) -> pd.DataFrame:
     return load_oscillations_file(
         filepath, file_not_found_handler=handle_missing_ad_summary
     )
 
 
-def handle_missing_ad_summary(filepath):
+def handle_missing_ad_summary(filepath: str) -> None:
     util.print_runtime_error_divider()
 
     util.eprint(
@@ -196,7 +204,7 @@ def handle_missing_ad_summary(filepath):
     sys.exit(1)
 
 
-def get_completed_tasks(config):
+def get_completed_tasks(config: Dict[str, Any]) -> Tuple[pd.DataFrame, str]:
     completed_filepath = "completed_tasks.csv"
 
     try:
@@ -211,11 +219,16 @@ def get_completed_tasks(config):
         return completed, completed_filepath
 
 
-def task_not_completed(completed, task_name):
+def task_not_completed(completed: pd.DataFrame, task_name: str) -> bool:
     return task_name not in list(completed["task_name"])
 
 
-def run_task(filepath, completed, task_name, task_function):
+def run_task(
+    filepath: str,
+    completed: List[pd.DataFrame],
+    task_name: str,
+    task_function: Callable[[], None],
+) -> None:
     start = datetime.datetime.now()
     task_function()
     end = datetime.datetime.now()

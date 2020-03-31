@@ -1,9 +1,14 @@
+from typing import Any
+
 import pandas as pd
 
 
 def read_oscillations_summary_file(
-    filepath, attributes_start_row=2, data_start_row=5, column_width=25
-):
+    filepath: str,
+    attributes_start_row: int = 2,
+    data_start_row: int = 5,
+    column_width: int = 25,
+) -> "OscillationsSummary":
     num_attributes = get_num_attributes(filepath, attributes_start_row)
 
     attr_widths = [column_width for _ in range(0, num_attributes)]
@@ -16,7 +21,7 @@ def read_oscillations_summary_file(
     return OscillationsSummary(attributes, data)
 
 
-def get_num_attributes(filepath, attributes_start_row):
+def get_num_attributes(filepath: str, attributes_start_row: int) -> int:
     with open(filepath) as f:
         for i, line in enumerate(f):
             if i == attributes_start_row - 1:
@@ -27,15 +32,15 @@ def get_num_attributes(filepath, attributes_start_row):
     )
 
 
-class OscillationsSummary(object):
-    def __init__(self, attributes, data):
+class OscillationsSummary:
+    def __init__(self, attributes: pd.DataFrame, data: pd.DataFrame) -> None:
         self.attributes = attributes
         self.data = data
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.attributes) + "\n" + str(self.data)
 
-    def get_attribute(self, attr):
+    def get_attribute(self, attr: str) -> Any:
         if self.has_attribute(attr):
             return self.attributes[attr].iloc[0]
         else:
@@ -45,5 +50,5 @@ class OscillationsSummary(object):
                 + '" is not a valid attribute for this oscillations summary.'
             )
 
-    def has_attribute(self, attr):
+    def has_attribute(self, attr: str) -> bool:
         return attr in list(self.attributes.columns.values)

@@ -1,23 +1,32 @@
-def create_grid(values, rows, params):
+from typing import Any, Dict, List, Set, Union
+
+import pandas as pd
+
+
+def create_grid(
+    rows: pd.DataFrame, params: Dict[str, Union[List[Any], Dict[str, Any]]]
+) -> List[Dict[str, Any]]:
     """
     Creates a grid of parameters using the given dict of possible parameter
     values.
 
-    >>> grid = create_grid({}, [], { \
+    >>> grid = create_grid([], { \
             "a": [0, 1, 2], \
             "b": ['a', "bob"] \
         })
     >>> sorted([sorted(x.items()) for x in grid])
     [[('a', 0), ('b', 'a')], [('a', 0), ('b', 'bob')], [('a', 1), ('b', 'a')], [('a', 1), ('b', 'bob')], [('a', 2), ('b', 'a')], [('a', 2), ('b', 'bob')]]
     """
-    processed_params = process_params(values, rows, params)
+    processed_params = process_params(rows, params)
 
     combinations = generate_param_combinations(processed_params)
 
     return combinations
 
 
-def process_params(values, rows, raw_params):
+def process_params(
+    rows: pd.DataFrame, raw_params: Dict[str, Union[List[Any], Dict[str, Any]]]
+) -> Dict[str, Set[Any]]:
     params = {}
     for key in raw_params:
         value = raw_params[key]
@@ -65,17 +74,22 @@ def process_params(values, rows, raw_params):
     return params
 
 
-def generate_param_combinations(params):
+def generate_param_combinations(params: Dict[str, Set[Any]]) -> List[Dict[str, Any]]:
     remaining = list(params.keys())
-    chosen = {}
-    combinations = []
+    chosen: Dict[str, Any] = {}
+    combinations: List[Dict[str, Any]] = []
 
     generate_param_combinations_h(params, remaining, chosen, combinations)
 
     return combinations
 
 
-def generate_param_combinations_h(params, remaining, chosen, combinations):
+def generate_param_combinations_h(
+    params: Dict[str, Set[Any]],
+    remaining: List[str],
+    chosen: Dict[str, Any],
+    combinations: List[Dict[str, Any]],
+) -> None:
     if len(remaining) == 0:
         combinations.append(chosen)
 

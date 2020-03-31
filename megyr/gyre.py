@@ -1,21 +1,25 @@
+from typing import Any, cast, Dict
+
 import os.path
+
+import pandas as pd
 
 from . import util
 
 
 def run_gyre(
-    config,
-    mesa_comb,
-    mesa_data,
-    gyre_comb,
-    work_dir,
-    output_dir,
-    mesa_dir_name,
-    logs_dir_name,
-    gyre_dir_name,
-    gyre_prefix,
-    gyre_ad_output_summary,
-):
+    config: Dict[str, Any],
+    mesa_comb: Dict[str, Any],
+    mesa_data: pd.DataFrame,
+    gyre_comb: Dict[str, Any],
+    work_dir: str,
+    output_dir: str,
+    mesa_dir_name: str,
+    logs_dir_name: str,
+    gyre_dir_name: str,
+    gyre_prefix: str,
+    gyre_ad_output_summary: str,
+) -> None:
     mesa_dir = os.path.join(output_dir, mesa_dir_name)
 
     gyre_dir = os.path.join(mesa_dir, gyre_dir_name)
@@ -46,14 +50,22 @@ def run_gyre(
     )
 
 
-def extract_additional_values(config, mesa_comb, mesa_data, gyre_comb):
+def extract_additional_values(
+    config: Dict[str, Any],
+    mesa_comb: Dict[str, Any],
+    mesa_data: pd.DataFrame,
+    gyre_comb: Dict[str, Any],
+) -> Dict[str, Any]:
     if "gyre_derived" in config["stages"]:
-        return config["stages"]["gyre_derived"](mesa_comb, mesa_data, gyre_comb)
+        return cast(
+            Dict[str, Any],
+            config["stages"]["gyre_derived"](mesa_comb, mesa_data, gyre_comb),
+        )
 
     return dict(gyre_comb)
 
 
-def create_gyre_prefix(gyre_comb):
+def create_gyre_prefix(gyre_comb: Dict[str, Any]) -> str:
     """
     Creates a GYRE run prefix to use for the given combination of GYRE
     parameter values. These prefixes should be unique within one MESA run, but
@@ -73,19 +85,19 @@ def create_gyre_prefix(gyre_comb):
 
 
 def create_gyre_config(
-    config,
-    mesa_comb,
-    gyre_comb,
-    work_dir,
-    output_dir,
-    mesa_dir_name,
-    logs_dir_name,
-    gyre_prefix,
-    gyre_dir_name,
-):
+    config: Dict[str, Any],
+    mesa_comb: Dict[str, Any],
+    gyre_comb: Dict[str, Any],
+    work_dir: str,
+    output_dir: str,
+    mesa_dir_name: str,
+    logs_dir_name: str,
+    gyre_prefix: str,
+    gyre_dir_name: str,
+) -> str:
     end = -1 * len(".mustache")
 
-    config_file = config["input"]["gyre_config"]
+    config_file = cast(str, config["input"]["gyre_config"])
     config_file_in = os.path.join(work_dir, config_file)
 
     config_file_out_name = config_file[:end] + "_" + gyre_prefix
@@ -107,7 +119,13 @@ def create_gyre_config(
     return config_file_out_name
 
 
-def exec_gyre(gyre_location, output_dir, mesa_dir_name, gyre_dir_name, gyre_config):
+def exec_gyre(
+    gyre_location: str,
+    output_dir: str,
+    mesa_dir_name: str,
+    gyre_dir_name: str,
+    gyre_config: str,
+) -> None:
     gyre_dir = os.path.join(output_dir, mesa_dir_name, gyre_dir_name)
 
     gyre_command = gyre_location + " " + gyre_config
