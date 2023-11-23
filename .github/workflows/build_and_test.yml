@@ -30,7 +30,7 @@ jobs:
         pip install mypy black pytest pylint pandas-stubs
     - name: Lint with mypy
       run: |
-        mypy megyr/*.py
+        mypy megyr/*.py --ignore-missing-imports --strict
     - name: Lint with black
       run: |
         black --check megyr/*.py
