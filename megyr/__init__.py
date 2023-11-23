@@ -237,14 +237,14 @@ def run_task(
     duration = (end - start).seconds
 
     new_row = pd.DataFrame(
-            {
-                "task_name": [task_name],
-                "start": [start],
-                "end": [end],
-                "duration": [duration],
-            }
-        )
-    
+        {
+            "task_name": [task_name],
+            "start": [start],
+            "end": [end],
+            "duration": [duration],
+        }
+    )
+
     completed = pd.concat([completed, new_row])
 
     # completed.append(
