@@ -1,4 +1,4 @@
-from typing import Any, Callable, cast, Dict, List
+from typing import Any, Callable, cast, Dict, List, Optional
 
 import datetime
 import importlib.util
@@ -48,14 +48,16 @@ class DataFrameAggregator:
     def append_from_file(
         self,
         filepath: str,
-        read_function: Callable[[str], pd.DataFrame] = pd.read_csv,
+        read_function: Callable[[str], Optional[pd.DataFrame]] = pd.read_csv,
         transform_func: Callable[[pd.DataFrame], pd.DataFrame] = lambda r: r,
     ) -> None:
         if self.should_read:
             new_rows = read_function(filepath)
+            assert new_rows is not None
 
             transformed = transform_func(new_rows)
 
+            # TODO: is tranformed supposed to be used here instead of new_rows?
             self.data = pd.concat([self.data, new_rows])
 
     def write_to_file(self, filepath: str) -> None:

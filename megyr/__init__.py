@@ -35,7 +35,7 @@ def run(config: Dict[str, Any]) -> None:
 
     # Get or calculate the mesa param grid
     if isinstance(mesa_params, dict):
-        mesa_grid = parameters.create_grid([], mesa_params)
+        mesa_grid = parameters.create_grid(pd.DataFrame(), mesa_params)
     else:
         mesa_grid = mesa_params
 
@@ -170,17 +170,18 @@ def load_or_collect_mesa_data(
 
 def load_oscillations_file(
     filepath: str, file_not_found_handler: Optional[Callable[[str], None]] = None
-) -> pd.DataFrame:
+) -> Optional[pd.DataFrame]:
     try:
         return oscillations_summary.read_oscillations_summary_file(filepath).data
     except FileNotFoundError as e:
         if file_not_found_handler is not None:
             file_not_found_handler(filepath)
+            return None
         else:
             raise e
 
 
-def load_ad_summary_file(filepath: str) -> pd.DataFrame:
+def load_ad_summary_file(filepath: str) -> Optional[pd.DataFrame]:
     return load_oscillations_file(
         filepath, file_not_found_handler=handle_missing_ad_summary
     )
@@ -225,7 +226,7 @@ def task_not_completed(completed: pd.DataFrame, task_name: str) -> bool:
 
 def run_task(
     filepath: str,
-    completed: List[pd.DataFrame],
+    completed: pd.DataFrame,
     task_name: str,
     task_function: Callable[[], None],
 ) -> None:
@@ -258,6 +259,6 @@ def run_task(
     # )
 
     with open(filepath, "a") as f:
-        new_row = ",".join([task_name, str(start), str(end), str(duration)])
+        new_row_contents = ",".join([task_name, str(start), str(end), str(duration)])
 
-        f.write(new_row + "\n")
+        f.write(new_row_contents + "\n")

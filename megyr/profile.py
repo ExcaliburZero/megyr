@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import os.path
 
@@ -46,7 +46,7 @@ def read_profile_file(
 
 
 class MESAProfile:
-    def __init__(self, attributes: pd.DataFrame, data: pd.DataFrame) -> None:
+    def __init__(self, attributes: pd.DataFrame, data: Optional[pd.DataFrame]) -> None:
         self.attributes = attributes
         self.data = data
 
