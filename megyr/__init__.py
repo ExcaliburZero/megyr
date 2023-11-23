@@ -235,8 +235,7 @@ def run_task(
 
     duration = (end - start).seconds
 
-    completed.append(
-        pd.DataFrame(
+    new_row = pd.DataFrame(
             {
                 "task_name": [task_name],
                 "start": [start],
@@ -244,7 +243,19 @@ def run_task(
                 "duration": [duration],
             }
         )
-    )
+    
+    completed = pd.concat([completed, new_row])
+
+    # completed.append(
+    #     pd.DataFrame(
+    #         {
+    #             "task_name": [task_name],
+    #             "start": [start],
+    #             "end": [end],
+    #             "duration": [duration],
+    #         }
+    #     )
+    # )
 
     with open(filepath, "a") as f:
         new_row = ",".join([task_name, str(start), str(end), str(duration)])
